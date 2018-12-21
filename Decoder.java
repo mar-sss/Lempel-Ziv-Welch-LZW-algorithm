@@ -59,28 +59,28 @@ public class Decoder {
          	
          br.close();
          			
-		Map<Integer, String> TABLE = new HashMap<Integer, String>();
+		Map<Integer, String> dictionary = new HashMap<Integer, String>();
 		for (int i = 0; i < 255; i++)
-			TABLE.put(i, "" + (char) i);
+			dictionary.put(i, "" + (char) i);
 
 		String Encode_values = "" + (char) (int) get_compress_values.remove(0);
 		
 		StringBuffer decoded_values = new StringBuffer(Encode_values);
 		
-		String get_value_from_table = null;
-		for (int check_key : get_compress_values) {
+		String entry = null;
+		for (int k : get_compress_values) {
 			
-			if (TABLE.containsKey(check_key))
-				get_value_from_table = TABLE.get(check_key);
-			else if (check_key == table_Size)
-				get_value_from_table = Encode_values + Encode_values.charAt(0);
+			if (dictionary.containsKey(k))
+				entry = dictionary.get(k);
+			else if (k == table_Size)
+				entry = Encode_values + Encode_values.charAt(0);
 			
-			decoded_values.append(get_value_from_table);
+			decoded_values.append(entry);
 			
 			if(table_Size < MAX_TABLE_SIZE )
-				TABLE.put(table_Size++, Encode_values + get_value_from_table.charAt(0));
+				dictionary.put(table_Size++, Encode_values + entry.charAt(0));
 
-			Encode_values = get_value_from_table;
+			Encode_values = entry;
 		}
 	
 	Create_decoded_file(decoded_values.toString());
