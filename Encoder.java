@@ -35,30 +35,30 @@ public class Encoder {
 			
 		double table_Size =  255;
 		
-		Map<String, Integer> TABLE = new HashMap<String, Integer>();
+		Map<String, Integer> Dictionary = new HashMap<String, Integer>();
 		
 		for (int i = 0; i < 255 ; i++)
-			TABLE.put("" + (char) i, i);
+			Dictionary.put("" + (char) i, i);
 
-		String initString = "";
+		String w = "";
 		
 		List<Integer> encoded_values = new ArrayList<Integer>();
 		
-		for (char symbol : input_string.toCharArray()) {
-			String Str_Symbol = initString + symbol;
-			if (TABLE.containsKey(Str_Symbol))
-				initString = Str_Symbol;
+		for (char c : input_string.toCharArray()) {
+			String wc = w + c;
+			if (Dictionary.containsKey(wc))
+				w = wc;
 			else {
-				encoded_values.add(TABLE.get(initString));
+				encoded_values.add(Dictionary.get(w));
 			
 				if(table_Size < MAX_TABLE_SIZE)
-					TABLE.put(Str_Symbol, (int) table_Size++);
-				initString = "" + symbol;
+					Dictionary.put(wc, (int) table_Size++);
+				w = "" + c;
 			}
 		}
 
-		if (!initString.equals(""))
-			encoded_values.add(TABLE.get(initString));
+		if (!w.equals(""))
+			encoded_values.add(Dictionary.get(w));
 		
 		CreateLZWfile(encoded_values); 
 		
