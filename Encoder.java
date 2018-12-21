@@ -30,15 +30,15 @@ public class Encoder {
 	 * @throws IOException */
 	
 	public static void Encode_string(String input_string, double Bit_Length) throws IOException {
-	
-		MAX_TABLE_SIZE = Math.pow(2, Bit_Length);	
+
+		MAX_TABLE_SIZE = Math.pow(2, Bit_Length);
 			
 		double table_Size =  255;
 		
-		Map<String, Integer> Dictionary = new HashMap<String, Integer>();
-		
+		Map<String, Integer> dictionary = new LinkedHashMap<String, Integer>();
+
 		for (int i = 0; i < 255 ; i++)
-			Dictionary.put("" + (char) i, i);
+			dictionary.put("" + (char) i, i);
 
 		String w = "";
 		
@@ -46,19 +46,21 @@ public class Encoder {
 		
 		for (char c : input_string.toCharArray()) {
 			String wc = w + c;
-			if (Dictionary.containsKey(wc))
+			if (dictionary.containsKey(wc))
 				w = wc;
 			else {
-				encoded_values.add(Dictionary.get(w));
+				encoded_values.add(dictionary.get(w));
 			
 				if(table_Size < MAX_TABLE_SIZE)
-					Dictionary.put(wc, (int) table_Size++);
+					dictionary.put(wc, (int) table_Size++);
 				w = "" + c;
 			}
 		}
 
 		if (!w.equals(""))
-			encoded_values.add(Dictionary.get(w));
+			encoded_values.add(dictionary.get(w));
+
+		System.out.println(dictionary.toString());
 		
 		CreateLZWfile(encoded_values); 
 		
@@ -114,3 +116,7 @@ public class Encoder {
 			
 	}
 }
+
+// TODO serialize dictionary
+// TODO make second encoding based on lookup on longest match dictionary
+// TODO adaptive bit coding based on needs?
