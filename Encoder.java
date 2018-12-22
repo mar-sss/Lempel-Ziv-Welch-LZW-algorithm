@@ -97,6 +97,42 @@ public class Encoder {
 		out.close();	
 	}
 
+	private static void serializeHashMap(Map<String, Integer> hmap){
+
+        try
+        {
+            FileOutputStream fos =
+                    new FileOutputStream("hashmap.ser");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(hmap);
+            oos.close();
+            fos.close();
+            System.out.printf("Serialized HashMap data is saved in hashmap.ser");
+        }catch(IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
+
+    }
+
+    private static void encodeByDictionary(Map<String, Integer> dictionary){
+	    // TODO
+        // iterate through text: when there is match in dictionary, read one more char
+        // When is no longer match, write code of the last match
+        // when we are at the end of the string, write match and end
+        // save the code to file.
+
+    }
+
+    private static String findLongestString(String text, Map<String, Integer> dictionary){
+
+        String sb = text;
+        
+
+        //TODO iterate over the whole HashMap and find longest String
+        return null;
+    }
+
 
 	public static void main(String[] args) throws IOException {
 				
