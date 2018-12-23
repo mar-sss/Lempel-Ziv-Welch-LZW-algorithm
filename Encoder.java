@@ -35,14 +35,14 @@ public class Encoder {
 			
 		double table_Size =  255;
 		
-		Map<String, Integer> dictionary = new LinkedHashMap<String, Integer>();
+		HashMap<String, Integer> dictionary = new HashMap<>();
 
 		for (int i = 0; i < 255 ; i++)
 			dictionary.put("" + (char) i, i);
 
 		String w = "";
 		
-		List<Integer> encoded_values = new ArrayList<Integer>();
+		List<Integer> encoded_values = new ArrayList<>();
 		
 		for (char c : input_string.toCharArray()) {
 			String wc = w + c;
