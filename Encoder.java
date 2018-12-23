@@ -71,7 +71,7 @@ public class Encoder {
         CreateLZWfile("new", encoded_values);
 
 
-		serializeHashMap(dictionary, File_Input);
+		serializeHashMap(dictionary);
 
 	}
 
@@ -106,17 +106,19 @@ public class Encoder {
 		out.close();	
 	}
 
-	private static void serializeHashMap(Map<String, Integer> hmap, String dictionary_file){
+	private static void serializeHashMap(HashMap<String, Integer> hmap){
+        String dictFileName = File_Input.substring(0,File_Input.indexOf(".")) + ".ser";
+
 
         try
         {
             FileOutputStream fos =
-                    new FileOutputStream(dictionary_file + ".ser");
+                    new FileOutputStream(dictFileName);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(hmap);
             oos.close();
             fos.close();
-            System.out.printf("Serialized HashMap data is saved in " + dictionary_file + ".ser");
+            System.out.printf("Serialized HashMap data is saved in " + dictFileName);
         }catch(IOException ioe)
         {
             ioe.printStackTrace();
