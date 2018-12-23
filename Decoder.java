@@ -84,9 +84,40 @@ public class Decoder {
 		}
 	
 	Create_decoded_file(decoded_values.toString());
-	
-	
-	
+
+
+
+	}
+
+
+	private static void Decode_String_dictionary(String file_Input2, String dictionary_file) throws IOException {
+
+		List<Integer> get_compress_values = new ArrayList<>();
+
+		BufferedReader br;
+		InputStream inputStream  = new FileInputStream(file_Input2);
+		Reader inputStreamReader = new InputStreamReader(inputStream, "UTF-16BE"); // The Charset UTF-16BE is used to read the 16-bit compressed file.
+
+		br = new BufferedReader(inputStreamReader);
+
+		double value=0;
+
+		// reads to the end of the stream
+		while((value = br.read()) != -1)
+		{
+			get_compress_values.add((int) value);
+		}
+
+		br.close();
+
+		// load dictionary from file
+		Map<Integer, String> dictionary = deserializeHashMap(dictionary_file);
+
+		StringBuilder decoded_values = new StringBuilder();
+		for (int k : get_compress_values) {
+			decoded_values.append(dictionary.get(k));
+		}
+		Create_decoded_file(decoded_values.toString());
 	}
 
 /*
@@ -151,10 +182,16 @@ public class Decoder {
 	public static void main(String[] args) throws IOException {
 		
 		File_Input = args[0];
-		int Bit_Length = Integer.parseInt(args[1]);
-		
-		Decode_String(File_Input,Bit_Length);
-		
+		if(args[1].equals("-d")){
+			Decode_String_dictionary(File_Input, args[2]); // we don't need bit length, because we don't build dictionary
+		}else if(args[1].equals("-b")){
+			int Bit_Length = Integer.parseInt(args[2]);
+			Decode_String(File_Input,Bit_Length);
+		}else{
+			System.out.println("Bad switch");
+		}
+
 		
 	}
+
 }
