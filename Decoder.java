@@ -116,6 +116,37 @@ public class Decoder {
 		
 		bufferedWriter.close();	
 	}
+	
+	private static HashMap<Integer, String> deserializeHashMap(String dictionary_file){
+
+		HashMap<String, Integer> originalMap;
+		HashMap<Integer, String> newMap = new HashMap<>();
+		try
+		{
+			FileInputStream fis = new FileInputStream(dictionary_file);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			originalMap = (HashMap) ois.readObject();
+			ois.close();
+			fis.close();
+		}catch(IOException ioe)
+		{
+			ioe.printStackTrace();
+			return null;
+		}catch(ClassNotFoundException c)
+		{
+			System.out.println("Class not found");
+			c.printStackTrace();
+			return null;
+		}
+		System.out.println("Deserialized HashMap..");
+
+		// reverse dictionary for further searching in it
+		for(Map.Entry<String, Integer> entry : originalMap.entrySet()){
+			newMap.put(entry.getValue(), entry.getKey());
+		}
+		return newMap;
+
+	}
 
 	public static void main(String[] args) throws IOException {
 		
