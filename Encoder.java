@@ -115,22 +115,34 @@ public class Encoder {
 
     }
 
-    private static void encodeByDictionary(Map<String, Integer> dictionary){
+    private static List<Integer> encodeByDictionary(String text, Map<String, Integer> dictionary){
 	    // TODO
         // iterate through text: when there is match in dictionary, read one more char
         // When is no longer match, write code of the last match
         // when we are at the end of the string, write match and end
         // save the code to file.
-
-    }
-
-    private static String findLongestString(String text, Map<String, Integer> dictionary){
-
-        String sb = text;
         
+        StringBuilder sb = new StringBuilder();
+        sb.append(text.charAt(0));
+        String previousSequence;
+        List<Integer> encoded_values = new ArrayList<Integer>();
+        char lastChar;
+        int i = 1;
+        while (i<text.length()){
+            previousSequence = sb.toString();
+            sb.append(text.charAt(i));
+            i++;
+            if (!dictionary.containsKey(sb.toString())){
+                encoded_values.add(dictionary.get(previousSequence));
+                lastChar = sb.charAt(sb.length()-1);
+                sb = new StringBuilder();
+                sb.append(lastChar);
+            }
+        }
 
-        //TODO iterate over the whole HashMap and find longest String
-        return null;
+        encoded_values.add(dictionary.get(sb.toString())); //last iteration because of while
+
+        return encoded_values;
     }
 
 
