@@ -62,8 +62,17 @@ public class Encoder {
 
 		System.out.println(dictionary.toString());
 		
-		CreateLZWfile(encoded_values); 
-		
+		CreateLZWfile("old", encoded_values);
+
+		//my new method:
+        encoded_values = encodeByDictionary(input_string, dictionary);
+
+        //System.out.println(encoded_values.toString());
+        CreateLZWfile("new", encoded_values);
+
+
+		serializeHashMap(dictionary);
+
 	}
 
 
@@ -72,11 +81,11 @@ public class Encoder {
 @throws IOException
 */
 
-	private static void CreateLZWfile(List<Integer> encoded_values) throws IOException {
+	private static void CreateLZWfile(String name, List<Integer> encoded_values) throws IOException {
 		
 		BufferedWriter out = null;
 		
-		LZWfilename = File_Input.substring(0,File_Input.indexOf(".")) + ".lzw";
+		LZWfilename = File_Input.substring(0,File_Input.indexOf(".")) + "_" + name + ".lzw";
 		
 		try {
 	            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(LZWfilename),"UTF_16BE")); //The Charset UTF-16BE is used to write as 16-bit compressed file
