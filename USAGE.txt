@@ -1,0 +1,13 @@
+COMPRESSION:
+cmd: "java Encoder <txt file path> <number of bit length of dictionary (max. 16)>"
+- e.g. "java Encoder test.txt 12
+- it creates two files: one compressed with standart LZW algorithm and one compressed with the enhance of dictionary entries and saves the dictionary too.
+
+DECOMPRESSION:
+cmd: "java Decoder <compressed file> <switch> <switch argument>"
+switch: -d or -bl
+-b switch argument = number of bit length of dictionary (max. 16)
+-d switch argument = dictionary file path
+
+- e.g. java Decoder test.lzw -b 12 -> it decompress the file compressed with standard LZW algorithm.
+- e.g. java Decoder test.lzw -d test.ser -> it decompress the file compressed with the enhance of dictionary entries
