@@ -1,3 +1,8 @@
+BUILD THE APP (Java JDK needed):
+cmd: "javac Encoder.java"
+cmd: "javac Decoder.java"
+- These commands will compile Java files and create Java runnable classes.
+
 COMPRESSION:
 cmd: "java Encoder <txt file path> <number of bit length of dictionary (max. 16)>"
 - e.g. "java Encoder test.txt 12
