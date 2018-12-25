@@ -54,22 +54,46 @@ public class Encoder {
 
 		if (!w.equals(""))
 			encoded_values.add(dictionary.get(w));
-
-		System.out.println(dictionary.toString());
 		
-		CreateLZWfile("old", encoded_values);
+		CreateLZWfile("noDict", encoded_values);
 
 		//my new method:
-        encoded_values = encodeByDictionary(input_string, dictionary);
-
-        //System.out.println(encoded_values.toString());
-        CreateLZWfile("new", encoded_values);
-
-
-		serializeHashMap(dictionary);
-
+        encodeByDictionary(input_string, dictionary);
 	}
 
+
+    private static void encodeByDictionary(String text, HashMap<String, Integer> dictionary) throws IOException{
+        // iterate through text: when there is match in dictionary, read one more char
+        // When is no longer match, write code of the last match
+        // when we are at the end of the string, write match and end
+        // save the code to file.
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(text.charAt(0));
+        String previousSequence;
+        List<Integer> encoded_values = new ArrayList<>();
+        HashMap<String, Integer> newDictionary = new HashMap<>();
+        char lastChar;
+        int i = 1;
+        while (i<text.length()){
+            previousSequence = sb.toString();
+            sb.append(text.charAt(i));
+            i++;
+            if (!dictionary.containsKey(sb.toString())){
+                encoded_values.add(dictionary.get(previousSequence));
+                newDictionary.put(previousSequence, dictionary.get(previousSequence));
+                lastChar = sb.charAt(sb.length()-1);
+                sb = new StringBuilder();
+                sb.append(lastChar);
+            }
+        }
+
+        encoded_values.add(dictionary.get(sb.toString())); //last iteration because of while
+        newDictionary.put(sb.toString(), dictionary.get(sb.toString()));
+        serializeHashMap(newDictionary);
+
+        CreateLZWfile("withDict", encoded_values);
+    }
 
 /*
 @param encoded_values , This hold the encoded text.
@@ -102,7 +126,7 @@ public class Encoder {
 	}
 
 	private static void serializeHashMap(HashMap<String, Integer> hmap){
-        String dictFileName = File_Input.substring(0,File_Input.indexOf(".")) + ".ser";
+        String dictFileName = File_Input.substring(0,File_Input.indexOf(".")) + ".dict";
 
 
         try
@@ -113,7 +137,7 @@ public class Encoder {
             oos.writeObject(hmap);
             oos.close();
             fos.close();
-            System.out.printf("Serialized HashMap data is saved in " + dictFileName);
+            System.out.printf("LZW dictionary is saved in " + dictFileName);
         }catch(IOException ioe)
         {
             ioe.printStackTrace();
@@ -121,35 +145,7 @@ public class Encoder {
 
     }
 
-    private static List<Integer> encodeByDictionary(String text, Map<String, Integer> dictionary){
-	    // TODO
-        // iterate through text: when there is match in dictionary, read one more char
-        // When is no longer match, write code of the last match
-        // when we are at the end of the string, write match and end
-        // save the code to file.
-        
-        StringBuilder sb = new StringBuilder();
-        sb.append(text.charAt(0));
-        String previousSequence;
-        List<Integer> encoded_values = new ArrayList<Integer>();
-        char lastChar;
-        int i = 1;
-        while (i<text.length()){
-            previousSequence = sb.toString();
-            sb.append(text.charAt(i));
-            i++;
-            if (!dictionary.containsKey(sb.toString())){
-                encoded_values.add(dictionary.get(previousSequence));
-                lastChar = sb.charAt(sb.length()-1);
-                sb = new StringBuilder();
-                sb.append(lastChar);
-            }
-        }
 
-        encoded_values.add(dictionary.get(sb.toString())); //last iteration because of while
-
-        return encoded_values;
-    }
 
 
 	public static void main(String[] args) throws IOException {
