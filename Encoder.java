@@ -180,7 +180,6 @@ public class Encoder {
     // TODO save dictionary with just used entries DONE
 // TODO adaptive bit coding based on needs?
 // TODO download books in txt and experiment with new compress method
+// TODO comments DONE
 
-// TODO Decoder, save dictionary only with actually used entries
-
-// TODO dokumentace - ovecny popis LZW, popis algoritmu, popis toho co se stane kdyz dojde misto v tabulce, popis jak se ukladaji zakodovane sekvence, moje vylepseni, samotny experiment, vysledky
+// TODO dokumentace - obecny popis LZW, popis algoritmu, popis toho co se stane kdyz dojde misto v tabulce, popis jak se ukladaji zakodovane sekvence, moje vylepseni, samotny experiment, vysledky
