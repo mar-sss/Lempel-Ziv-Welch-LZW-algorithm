@@ -25,7 +25,7 @@ public class Decoder {
 	 * @throws IOException */
 
 
-	public static void Decode_String(String file_Input2, double bit_Length) throws IOException {
+	private static void Decode_String(String file_Input2, double bit_Length) throws IOException {
 		
 		
 		MAX_TABLE_SIZE = Math.pow(2, bit_Length);
@@ -161,7 +161,7 @@ public class Decoder {
 			c.printStackTrace();
 			return null;
 		}
-		System.out.println("Deserialized HashMap..");
+		System.out.println("Loaded LZW dictionary from " + dictionary_file);
 
 		// reverse dictionary for further searching in it
 		for(Map.Entry<String, Integer> entry : originalMap.entrySet()){

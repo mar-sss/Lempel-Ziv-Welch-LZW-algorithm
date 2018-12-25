@@ -24,7 +24,7 @@ public class Encoder {
 	 * @param input_string //Filename that is used for encoding.
 	 * @throws IOException */
 	
-	public static void Encode_string(String input_string, double Bit_Length) throws IOException {
+	private static void Encode_string(String input_string, double Bit_Length) throws IOException {
 
 		MAX_TABLE_SIZE = Math.pow(2, Bit_Length);
 			
