@@ -14,14 +14,14 @@ import java.util.*;
 
 public class Encoder {
 	
-	private static String FILE_INPUT = null;
+	private static String FILE_INPUT = null; //File path of the input text for compression.
 	private static double MAX_DICT_SIZE; //Max Dictionary size is based on the bit length input.
-	private static String LZW_FILE_NAME;
+	private static String LZW_FILE_NAME; //File path of the output compressed text.
 	
 
-	/** Compress a string text (by standard LZW and enhanced LZW) to a list of output symbols and then pass it for compress file creation.
-	 * @param bitLength //Provided as user input.
-	 * @param inputText //Filename that is used for encoding.
+	/** Compress a string text (by standard LZW and extended LZW) to a list of output symbols and then pass it for compress file creation.
+     * @param inputText //String text that is used for encoding.
+     * @param bitLength //Provided as user input. It is used for determining dictionary size.
 	 * @throws IOException */
 	
 	private static void encodeStandardLZW(String inputText, double bitLength) throws IOException {
@@ -61,23 +61,27 @@ public class Encoder {
         encodeWithDictionary(inputText, dictionary);
 	}
 
+    /** Compress a string text using built dictionary. The dictionary is used for finding longest matches in the input text.
+     * @param inputText //String text that is used for encoding.
+     * @param dictionary //Object providing built dictionary by standard LZW method
+     * @throws IOException */
 
-    private static void encodeWithDictionary(String text, HashMap<String, Integer> dictionary) throws IOException{
+    private static void encodeWithDictionary(String inputText, HashMap<String, Integer> dictionary) throws IOException{
         // iterate through text: when there is match in dictionary, read one more char
         // When is no longer match, write code of the last match
         // when we are at the end of the string, write match and end
         // save the code to file.
 
         StringBuilder sb = new StringBuilder();
-        sb.append(text.charAt(0));
+        sb.append(inputText.charAt(0));
         String previousSequence;
         List<Integer> encodedValues = new ArrayList<>();
         HashMap<String, Integer> newDictionary = new HashMap<>();
         char lastChar;
         int i = 1;
-        while (i<text.length()){
+        while (i<inputText.length()){
             previousSequence = sb.toString();
-            sb.append(text.charAt(i));
+            sb.append(inputText.charAt(i));
             i++;
             if (!dictionary.containsKey(sb.toString())){
                 encodedValues.add(dictionary.get(previousSequence));
@@ -95,9 +99,10 @@ public class Encoder {
         CreateLZWfile("withDict", encodedValues);
     }
 
-    /**
-    * @param encodedValues , This hold the encoded text.
-    * @throws IOException */
+    /** Creates new file containing compressed text as encoded values.
+     * @param name //String that will be appended in the end of file name (before suffix).
+     * @param encodedValues //This holds the encoded text (numbers representing dictionary entries).
+     * @throws IOException */
 
 	private static void CreateLZWfile(String name, List<Integer> encodedValues) throws IOException {
 		
@@ -124,9 +129,13 @@ public class Encoder {
 		out.close();	
 	}
 
-	private static void saveDictionary(HashMap<String, Integer> hmap){
-        String dictFileName = FILE_INPUT.substring(0, FILE_INPUT.indexOf(".")) + ".dict";
+    /** Saves dictionary to file. Saving progress is made by Java serialization utility.
+     * @param hmap //Object representing dictionary which will be saved.
+     * @throws IOException */
 
+	private static void saveDictionary(HashMap<String, Integer> hmap){
+
+        String dictFileName = FILE_INPUT.substring(0, FILE_INPUT.indexOf(".")) + ".dict";
 
         try
         {
@@ -141,7 +150,6 @@ public class Encoder {
         {
             ioe.printStackTrace();
         }
-
     }
 
 
@@ -149,11 +157,12 @@ public class Encoder {
 
 	public static void main(String[] args) throws IOException {
 				
-		FILE_INPUT = args[0];
-		int bitLength = Integer.parseInt(args[1]);
+		FILE_INPUT = args[0]; // cmd first argument determining input file containing text
+		int bitLength = Integer.parseInt(args[1]); // cmd second argument determining bit length of dictionary
 		
 		StringBuffer inputText = new StringBuffer();
-		
+
+		// loading the input text from specified file
 		try (BufferedReader br = Files.newBufferedReader(Paths.get(FILE_INPUT), StandardCharsets.UTF_8)) {
 		    for (String line = null; (line = br.readLine()) != null;) {
 		        
@@ -161,8 +170,7 @@ public class Encoder {
 		    }
 		}
 	
-		encodeStandardLZW(inputText.toString(),bitLength);
-			
+		encodeStandardLZW(inputText.toString(),bitLength); // calling the method for compression
 	}
 }
 
