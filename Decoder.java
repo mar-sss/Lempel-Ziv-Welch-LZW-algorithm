@@ -13,32 +13,32 @@ import java.util.*;
 public class Decoder {
 	
 	
-	private static String File_Input = null;
-	private static double MAX_TABLE_SIZE; //Max Table size is based on the bit length input.
-	private static String LZWfilename;
+	private static String FILE_INPUT = null;
+	private static double MAX_DICT_SIZE; //Max Dictionary size is based on the bit length input.
+	private static String LZW_FILE_NAME;
 	
 
 	
-	/* Decodes the the compressed file to a decoded input file. 
-	 * @param file_Input2 //The name of compressed file.
-	 * @param bit_Length  //Provided as user input.
+	/** Decodes the the compressed file to a decoded input file.
+	 * @param inputText //The name of compressed file.
+	 * @param bitLength  //Provided as user input.
 	 * @throws IOException */
 
 
-	private static void Decode_String(String file_Input2, double bit_Length) throws IOException {
+	private static void decodeStandardLZW(String inputText, double bitLength) throws IOException {
 		
 		
-		MAX_TABLE_SIZE = Math.pow(2, bit_Length);
+		MAX_DICT_SIZE = Math.pow(2, bitLength);
 		
 		
-		List<Integer> get_compress_values = new ArrayList<Integer>();
-		int table_Size = 255;
+		List<Integer> compressedValues = new ArrayList<Integer>();
+		int tableSize = 255;
 		
-		
+
 		BufferedReader br = null;
-		InputStream inputStream  = new FileInputStream(file_Input2);
+		InputStream inputStream  = new FileInputStream(inputText);
 		Reader inputStreamReader = new InputStreamReader(inputStream, "UTF-16BE"); // The Charset UTF-16BE is used to read the 16-bit compressed file.
-	
+
 		br = new BufferedReader(inputStreamReader);
 		  
 		double value=0;
@@ -46,7 +46,7 @@ public class Decoder {
          // reads to the end of the stream 
          while((value = br.read()) != -1)
          {
-        	 get_compress_values.add((int) value);
+        	 compressedValues.add((int) value);
          }
          	
          br.close();
@@ -55,39 +55,39 @@ public class Decoder {
 		for (int i = 0; i < 255; i++)
 			dictionary.put(i, "" + (char) i);
 
-		String Encode_values = "" + (char) (int) get_compress_values.remove(0);
+		String encodeValues = "" + (char) (int) compressedValues.remove(0);
 		
-		StringBuffer decoded_values = new StringBuffer(Encode_values);
+		StringBuffer decodedValues = new StringBuffer(encodeValues);
 		
 		String entry = null;
-		for (int k : get_compress_values) {
+		for (int k : compressedValues) {
 			
 			if (dictionary.containsKey(k))
 				entry = dictionary.get(k);
-			else if (k == table_Size)
-				entry = Encode_values + Encode_values.charAt(0);
+			else if (k == tableSize)
+				entry = encodeValues + encodeValues.charAt(0);
 			
-			decoded_values.append(entry);
+			decodedValues.append(entry);
 			
-			if(table_Size < MAX_TABLE_SIZE )
-				dictionary.put(table_Size++, Encode_values + entry.charAt(0));
+			if(tableSize < MAX_DICT_SIZE)
+				dictionary.put(tableSize++, encodeValues + entry.charAt(0));
 
-			Encode_values = entry;
+			encodeValues = entry;
 		}
 	
-	Create_decoded_file(decoded_values.toString());
+	createDecodedFile(decodedValues.toString());
 
 
 
 	}
 
 
-	private static void Decode_String_dictionary(String file_Input2, String dictionary_file) throws IOException {
+	private static void decodeWithDictionary(String inputText, String dictionaryFilePath) throws IOException {
 
-		List<Integer> get_compress_values = new ArrayList<>();
+		List<Integer> compressedValues = new ArrayList<>();
 
 		BufferedReader br;
-		InputStream inputStream  = new FileInputStream(file_Input2);
+		InputStream inputStream  = new FileInputStream(inputText);
 		Reader inputStreamReader = new InputStreamReader(inputStream, "UTF-16BE"); // The Charset UTF-16BE is used to read the 16-bit compressed file.
 
 		br = new BufferedReader(inputStreamReader);
@@ -97,19 +97,19 @@ public class Decoder {
 		// reads to the end of the stream
 		while((value = br.read()) != -1)
 		{
-			get_compress_values.add((int) value);
+			compressedValues.add((int) value);
 		}
 
 		br.close();
 
 		// load dictionary from file
-		Map<Integer, String> dictionary = deserializeHashMap(dictionary_file);
+		Map<Integer, String> dictionary = loadDictionary(dictionaryFilePath);
 
-		StringBuilder decoded_values = new StringBuilder();
-		for (int k : get_compress_values) {
-			decoded_values.append(dictionary.get(k));
+		StringBuilder decodedValues = new StringBuilder();
+		for (int k : compressedValues) {
+			decodedValues.append(dictionary.get(k));
 		}
-		Create_decoded_file(decoded_values.toString());
+		createDecodedFile(decodedValues.toString());
 	}
 
 /*
@@ -118,18 +118,18 @@ public class Decoder {
 
 */
 
-	private static void Create_decoded_file(String decoded_values) throws IOException {
+	private static void createDecodedFile(String decodedValues) throws IOException {
         
 		
-		LZWfilename = File_Input.substring(0,File_Input.indexOf(".")) + "_decoded.txt";
+		LZW_FILE_NAME = FILE_INPUT.substring(0, FILE_INPUT.indexOf(".")) + "_decoded.txt";
 		
-		 FileWriter writer = new FileWriter(LZWfilename, true);
+		 FileWriter writer = new FileWriter(LZW_FILE_NAME, true);
 		 BufferedWriter bufferedWriter = new BufferedWriter(writer);
 		
 	
 		try {
 			
-			bufferedWriter.write(decoded_values);
+			bufferedWriter.write(decodedValues);
 		
 			}
 		 catch (IOException e) {
@@ -140,13 +140,13 @@ public class Decoder {
 		bufferedWriter.close();	
 	}
 	
-	private static HashMap<Integer, String> deserializeHashMap(String dictionary_file){
+	private static HashMap<Integer, String> loadDictionary(String dictionaryFilePath){
 
 		HashMap<String, Integer> originalMap;
 		HashMap<Integer, String> newMap = new HashMap<>();
 		try
 		{
-			FileInputStream fis = new FileInputStream(dictionary_file);
+			FileInputStream fis = new FileInputStream(dictionaryFilePath);
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			originalMap = (HashMap) ois.readObject();
 			ois.close();
@@ -161,7 +161,7 @@ public class Decoder {
 			c.printStackTrace();
 			return null;
 		}
-		System.out.println("Loaded LZW dictionary from " + dictionary_file);
+		System.out.println("Loaded LZW dictionary from " + dictionaryFilePath);
 
 		// reverse dictionary for further searching in it
 		for(Map.Entry<String, Integer> entry : originalMap.entrySet()){
@@ -173,12 +173,12 @@ public class Decoder {
 
 	public static void main(String[] args) throws IOException {
 		
-		File_Input = args[0];
+		FILE_INPUT = args[0];
 		if(args[1].equals("-d")){
-			Decode_String_dictionary(File_Input, args[2]); // we don't need bit length, because we don't build dictionary
+			decodeWithDictionary(FILE_INPUT, args[2]); // we don't need bit length, because we don't build dictionary
 		}else if(args[1].equals("-b")){
-			int Bit_Length = Integer.parseInt(args[2]);
-			Decode_String(File_Input,Bit_Length);
+			int bitLength = Integer.parseInt(args[2]);
+			decodeStandardLZW(FILE_INPUT,bitLength);
 		}else{
 			System.out.println("Bad switch");
 		}
