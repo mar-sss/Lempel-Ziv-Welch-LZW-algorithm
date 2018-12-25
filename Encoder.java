@@ -14,21 +14,21 @@ import java.util.*;
 
 public class Encoder {
 	
-	private static String File_Input = null;
-	private static double MAX_TABLE_SIZE; //Max Table size is based on the bit length input.
-	private static String LZWfilename;
+	private static String FILE_INPUT = null;
+	private static double MAX_DICT_SIZE; //Max Dictionary size is based on the bit length input.
+	private static String LZW_FILE_NAME;
 	
 
-	/** Compress a string to a list of output symbols and then pass it for compress file creation.
-	 * @param Bit_Length //Provided as user input.
-	 * @param input_string //Filename that is used for encoding.
+	/** Compress a string text (by standard LZW and enhanced LZW) to a list of output symbols and then pass it for compress file creation.
+	 * @param bitLength //Provided as user input.
+	 * @param inputText //Filename that is used for encoding.
 	 * @throws IOException */
 	
-	private static void Encode_string(String input_string, double Bit_Length) throws IOException {
+	private static void encodeStandardLZW(String inputText, double bitLength) throws IOException {
 
-		MAX_TABLE_SIZE = Math.pow(2, Bit_Length);
+		MAX_DICT_SIZE = Math.pow(2, bitLength);
 			
-		double table_Size =  255;
+		double tableSize =  255;
 		
 		HashMap<String, Integer> dictionary = new HashMap<>();
 
@@ -37,32 +37,32 @@ public class Encoder {
 
 		String w = "";
 		
-		List<Integer> encoded_values = new ArrayList<>();
+		List<Integer> encodedValues = new ArrayList<>();
 		
-		for (char c : input_string.toCharArray()) {
+		for (char c : inputText.toCharArray()) {
 			String wc = w + c;
 			if (dictionary.containsKey(wc))
 				w = wc;
 			else {
-				encoded_values.add(dictionary.get(w));
+				encodedValues.add(dictionary.get(w));
 			
-				if(table_Size < MAX_TABLE_SIZE)
-					dictionary.put(wc, (int) table_Size++);
+				if(tableSize < MAX_DICT_SIZE)
+					dictionary.put(wc, (int) tableSize++);
 				w = "" + c;
 			}
 		}
 
 		if (!w.equals(""))
-			encoded_values.add(dictionary.get(w));
+			encodedValues.add(dictionary.get(w));
 		
-		CreateLZWfile("noDict", encoded_values);
+		CreateLZWfile("noDict", encodedValues);
 
 		//my new method:
-        encodeByDictionary(input_string, dictionary);
+        encodeWithDictionary(inputText, dictionary);
 	}
 
 
-    private static void encodeByDictionary(String text, HashMap<String, Integer> dictionary) throws IOException{
+    private static void encodeWithDictionary(String text, HashMap<String, Integer> dictionary) throws IOException{
         // iterate through text: when there is match in dictionary, read one more char
         // When is no longer match, write code of the last match
         // when we are at the end of the string, write match and end
@@ -71,7 +71,7 @@ public class Encoder {
         StringBuilder sb = new StringBuilder();
         sb.append(text.charAt(0));
         String previousSequence;
-        List<Integer> encoded_values = new ArrayList<>();
+        List<Integer> encodedValues = new ArrayList<>();
         HashMap<String, Integer> newDictionary = new HashMap<>();
         char lastChar;
         int i = 1;
@@ -80,7 +80,7 @@ public class Encoder {
             sb.append(text.charAt(i));
             i++;
             if (!dictionary.containsKey(sb.toString())){
-                encoded_values.add(dictionary.get(previousSequence));
+                encodedValues.add(dictionary.get(previousSequence));
                 newDictionary.put(previousSequence, dictionary.get(previousSequence));
                 lastChar = sb.charAt(sb.length()-1);
                 sb = new StringBuilder();
@@ -88,32 +88,31 @@ public class Encoder {
             }
         }
 
-        encoded_values.add(dictionary.get(sb.toString())); //last iteration because of while
+        encodedValues.add(dictionary.get(sb.toString())); //last iteration because of while
         newDictionary.put(sb.toString(), dictionary.get(sb.toString()));
-        serializeHashMap(newDictionary);
+        saveDictionary(newDictionary);
 
-        CreateLZWfile("withDict", encoded_values);
+        CreateLZWfile("withDict", encodedValues);
     }
 
-/*
-@param encoded_values , This hold the encoded text.
-@throws IOException
-*/
+    /**
+    * @param encodedValues , This hold the encoded text.
+    * @throws IOException */
 
-	private static void CreateLZWfile(String name, List<Integer> encoded_values) throws IOException {
+	private static void CreateLZWfile(String name, List<Integer> encodedValues) throws IOException {
 		
 		BufferedWriter out = null;
 		
-		LZWfilename = File_Input.substring(0,File_Input.indexOf(".")) + "_" + name + ".lzw";
+		LZW_FILE_NAME = FILE_INPUT.substring(0, FILE_INPUT.indexOf(".")) + "_" + name + ".lzw";
 		
 		try {
-	            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(LZWfilename),"UTF_16BE")); //The Charset UTF-16BE is used to write as 16-bit compressed file
+	            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(LZW_FILE_NAME),"UTF_16BE")); //The Charset UTF-16BE is used to write as 16-bit compressed file
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 		try {
-			Iterator<Integer> Itr = encoded_values.iterator();
+			Iterator<Integer> Itr = encodedValues.iterator();
 			while (Itr.hasNext()) {
 				out.write(Itr.next());
 			}
@@ -125,8 +124,8 @@ public class Encoder {
 		out.close();	
 	}
 
-	private static void serializeHashMap(HashMap<String, Integer> hmap){
-        String dictFileName = File_Input.substring(0,File_Input.indexOf(".")) + ".dict";
+	private static void saveDictionary(HashMap<String, Integer> hmap){
+        String dictFileName = FILE_INPUT.substring(0, FILE_INPUT.indexOf(".")) + ".dict";
 
 
         try
@@ -150,23 +149,30 @@ public class Encoder {
 
 	public static void main(String[] args) throws IOException {
 				
-		File_Input = args[0];
-		int Bit_Length = Integer.parseInt(args[1]);
+		FILE_INPUT = args[0];
+		int bitLength = Integer.parseInt(args[1]);
 		
-		StringBuffer input_string1 = new StringBuffer();
+		StringBuffer inputText = new StringBuffer();
 		
-		try (BufferedReader br = Files.newBufferedReader(Paths.get(File_Input), StandardCharsets.UTF_8)) {
+		try (BufferedReader br = Files.newBufferedReader(Paths.get(FILE_INPUT), StandardCharsets.UTF_8)) {
 		    for (String line = null; (line = br.readLine()) != null;) {
 		        
-		    	input_string1 = input_string1.append(line);
+		    	inputText = inputText.append(line);
 		    }
 		}
 	
-		Encode_string(input_string1.toString(),Bit_Length);
+		encodeStandardLZW(inputText.toString(),bitLength);
 			
 	}
 }
 
-// TODO serialize dictionary
-// TODO make second encoding based on lookup on longest match dictionary
+// TODO serialize dictionary = DONE
+// TODO make second encoding based on lookup on longest match dictionary DONE
+    // TODO make compress method with switch argument DONE
+    // TODO save dictionary with just used entries DONE
 // TODO adaptive bit coding based on needs?
+// TODO download books in txt and experiment with new compress method
+
+// TODO Decoder, save dictionary only with actually used entries
+
+// TODO dokumentace - ovecny popis LZW, popis algoritmu, popis toho co se stane kdyz dojde misto v tabulce, popis jak se ukladaji zakodovane sekvence, moje vylepseni, samotny experiment, vysledky
