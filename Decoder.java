@@ -50,9 +50,9 @@ public class Decoder {
 		for (int i = 0; i <= 255; i++)
 			dictionary.put(i, "" + (char) i);
 
-		String encodeValues = "" + (char) (int) compressedValues.remove(0);
+		String w = "" + (char) (int) compressedValues.remove(0);
 		
-		StringBuffer decodedValues = new StringBuffer(encodeValues);
+		StringBuffer decodedValues = new StringBuffer(w);
 		
 		String entry = null;
 		for (int k : compressedValues) {
@@ -60,14 +60,14 @@ public class Decoder {
 			if (dictionary.containsKey(k))
 				entry = dictionary.get(k);
 			else if (k == tableSize)
-				entry = encodeValues + encodeValues.charAt(0);
+				entry = w + w.charAt(0);
 			
 			decodedValues.append(entry);
 			
 			if(tableSize < MAX_DICT_SIZE)
-				dictionary.put(tableSize++, encodeValues + entry.charAt(0));
+				dictionary.put(tableSize++, w + entry.charAt(0));
 
-			encodeValues = entry;
+			w = entry;
 		}
 	
 		createDecodedFile(decodedValues.toString());

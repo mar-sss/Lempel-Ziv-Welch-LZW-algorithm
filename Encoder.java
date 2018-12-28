@@ -24,13 +24,13 @@ public class Encoder {
      * @param bitLength //Provided as user input. It is used for determining dictionary size.
 	 * @throws IOException */
 	
-	private static void encodeStandardLZW(String inputText, double bitLength) throws IOException {
+	private static void encodeText(String inputText, double bitLength) throws IOException {
 
 		MAX_DICT_SIZE = Math.pow(2, bitLength);
 			
 		double tableSize =  256;
 		
-		HashMap<String, Integer> dictionary = new HashMap<>();
+		HashMap<String, Integer> dictionary = new LinkedHashMap<>();
 
 		for (int i = 0; i <= 255 ; i++)
 			dictionary.put("" + (char) i, i);
@@ -55,7 +55,7 @@ public class Encoder {
 		if (!w.equals(""))
 			encodedValues.add(dictionary.get(w));
 		
-		CreateLZWfile("noDict", encodedValues);
+		createLZWFile("noDict", encodedValues);
 
 		//my new method:
         encodeWithDictionary(inputText, dictionary);
@@ -96,7 +96,7 @@ public class Encoder {
         newDictionary.put(sb.toString(), dictionary.get(sb.toString()));
         saveDictionary(newDictionary);
 
-        CreateLZWfile("withDict", encodedValues);
+        createLZWFile("withDict", encodedValues);
     }
 
     /** Creates new file containing compressed text as encoded values.
@@ -104,7 +104,7 @@ public class Encoder {
      * @param encodedValues //This holds the encoded text (numbers representing dictionary entries).
      * @throws IOException */
 
-	private static void CreateLZWfile(String name, List<Integer> encodedValues) throws IOException {
+	private static void createLZWFile(String name, List<Integer> encodedValues) throws IOException {
 		
 		BufferedWriter out = null;
 		
@@ -170,7 +170,7 @@ public class Encoder {
 		    }
 		}
 	
-		encodeStandardLZW(inputText.toString(),bitLength); // calling the method for compression
+		encodeText(inputText.toString(),bitLength); // calling the method for compression
 	}
 }
 
