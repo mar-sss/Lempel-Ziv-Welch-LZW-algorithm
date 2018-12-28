@@ -28,7 +28,7 @@ public class Decoder {
 		MAX_DICT_SIZE = Math.pow(2, bitLength);
 
 		List<Integer> compressedValues = new ArrayList<Integer>();
-		int tableSize = 255;
+		int tableSize = 256;
 
 		BufferedReader br = null;
 		InputStream inputStream  = new FileInputStream(encodedFile);
@@ -47,7 +47,7 @@ public class Decoder {
          br.close();
          			
 		Map<Integer, String> dictionary = new HashMap<Integer, String>();
-		for (int i = 0; i < 255; i++)
+		for (int i = 0; i <= 255; i++)
 			dictionary.put(i, "" + (char) i);
 
 		String encodeValues = "" + (char) (int) compressedValues.remove(0);

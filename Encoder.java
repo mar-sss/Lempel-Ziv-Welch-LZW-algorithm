@@ -28,11 +28,11 @@ public class Encoder {
 
 		MAX_DICT_SIZE = Math.pow(2, bitLength);
 			
-		double tableSize =  255;
+		double tableSize =  256;
 		
 		HashMap<String, Integer> dictionary = new HashMap<>();
 
-		for (int i = 0; i < 255 ; i++)
+		for (int i = 0; i <= 255 ; i++)
 			dictionary.put("" + (char) i, i);
 
 		String w = "";
